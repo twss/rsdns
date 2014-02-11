@@ -49,6 +49,11 @@ function create_a () {
 	if [ $FOUND -eq 1 ]
 	then
       
+      # Strip the @. prefix as this can't be sent in.
+      if [[ $NAME == @.* ]]; then
+        NAME=`echo "$NAME" | sed -e "s/@\.//"`
+      fi
+      
       #RSPOST='{"records":[{ "type" : "A", "name" : "b.test.linickx.co.uk", "data" : "192.168.192.1", "ttl" : 86400 }]}'
       RSPOST=`echo '{"records":[{ "type" : "A", "name" : "'$NAME'", "data" : "'$IP'", "ttl" : '$TTL' }]}'`
       
@@ -66,11 +71,16 @@ function update_a() {
   fi
 
   get_domain $NAME
-  
+
   RECORDTYPE="A"
   
   get_recordid
   
+      # Strip the @. prefix as this can't be sent in.
+      if [[ $NAME == @.* ]]; then
+        NAME=`echo "$NAME" | sed -e "s/@\.//"`
+      fi
+      
       RSPOST=`echo '{ "name" : "'$NAME'", "data" : "'$IP'", "ttl" : '$TTL' }'`
   
       RC=`curl -k -s -X PUT -H X-Auth-Token:\ $TOKEN -H Content-Type:\ application/json  -H Accept:\ application/json $DNSSVR/$USERID/domains/$DOMAINID/records/$RECORDID --data "$RSPOST" |tr -s '[:cntrl:]' "\n"`

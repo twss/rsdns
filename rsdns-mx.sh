@@ -44,6 +44,11 @@ function create_mx () {
 	if [ $FOUND -eq 1 ]
 	then
       
+      # Strip the @. prefix as this can't be sent in.
+      if [[ $NAME == @.* ]]; then
+        NAME=`echo "$NAME" | sed -e "s/@\.//"`
+      fi
+      
       RSPOST=`echo '{"records":[{ "priority" : '$PRIORITY',"type" : "MX", "name" : "'$NAME'", "data" : "'$DATA'", "ttl" : '$TTL' }]}'`
       
      create_record
